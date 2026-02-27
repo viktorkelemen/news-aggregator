@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link rel="alternate" type="application/rss+xml" title="RSS Feed" href="/feed.xml">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 800px; margin: 0 auto; padding: 1rem; background: #fafafa; color: #222; }
+        header { margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
+        h1 { font-size: 1.4rem; }
+        .rss-link { font-size: 0.85rem; color: #e67e22; text-decoration: none; }
+        nav { margin-bottom: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        nav a { padding: 0.3rem 0.7rem; border-radius: 4px; text-decoration: none; font-size: 0.85rem; background: #e8e8e8; color: #333; }
+        nav a.active { background: #333; color: #fff; }
+        .article { padding: 0.8rem 0; border-bottom: 1px solid #e0e0e0; }
+        .article h2 { font-size: 1rem; margin-bottom: 0.25rem; }
+        .article h2 a { color: #1a0dab; text-decoration: none; }
+        .article h2 a:hover { text-decoration: underline; }
+        .meta { font-size: 0.8rem; color: #666; margin-bottom: 0.3rem; }
+        .summary { font-size: 0.9rem; color: #444; line-height: 1.4; }
+        .pagination { margin-top: 1rem; display: flex; gap: 1rem; }
+        .pagination a { color: #1a0dab; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>{{ title }}</h1>
+        <a class="rss-link" href="/feed.xml">📡 RSS Feed</a>
+    </header>
+    <nav>
+        <a href="/" class="{{ 'active' if not current_source else '' }}">All</a>
+        {% for s in sources %}
+        <a href="/?source={{ s }}" class="{{ 'active' if current_source == s else '' }}">{{ s }}</a>
+        {% endfor %}
+    </nav>
+    {% for a in articles %}
+    <div class="article">
+        <h2><a href="{{ a.link }}" target="_blank" rel="noopener">{{ a.title }}</a></h2>
+        <div class="meta">{{ a.source }} · {{ a.published.strftime('%Y-%m-%d %H:%M') if a.published else '' }}</div>
+        {% if a.summary %}<div class="summary">{{ a.summary[:300] | e }}{% if a.summary|length > 300 %}…{% endif %}</div>{% endif %}
+    </div>
+    {% endfor %}
+    <div class="pagination">
+        {% if page > 1 %}<a href="/?page={{ page - 1 }}{% if current_source %}&source={{ current_source }}{% endif %}">← Previous</a>{% endif %}
+        {% if has_next %}<a href="/?page={{ page + 1 }}{% if current_source %}&source={{ current_source }}{% endif %}">Next →</a>{% endif %}
+    </div>
+</body>
+</html>
