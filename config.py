@@ -7,7 +7,7 @@ if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
 PORT = int(os.environ.get("PORT", 8000))
-FETCH_INTERVAL_MINUTES = int(os.environ.get("FETCH_INTERVAL_MINUTES", "30"))
+FETCH_INTERVAL_MINUTES = int(os.environ.get("FETCH_INTERVAL_MINUTES", "360"))
 
 SITE_TITLE = os.environ.get("SITE_TITLE", "News Aggregator")
 FEED_TITLE = os.environ.get("FEED_TITLE", "Curated News Feed")
