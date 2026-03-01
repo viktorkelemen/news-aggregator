@@ -22,6 +22,7 @@
         .summary { font-size: 0.9rem; color: #444; line-height: 1.4; }
         .pagination { margin-top: 1rem; display: flex; gap: 1rem; }
         .pagination a { color: #1a0dab; text-decoration: none; }
+        .filter-status { font-size: 0.8rem; color: #888; margin-bottom: 1rem; padding: 0.4rem 0.6rem; background: #f0f0f0; border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -32,9 +33,10 @@
     <nav>
         <a href="/" class="{{ 'active' if not current_source else '' }}">All</a>
         {% for s in sources %}
-        <a href="/?source={{ s }}" class="{{ 'active' if current_source == s else '' }}">{{ s }}</a>
+        <a href="/?source={{ s | urlencode }}" class="{{ 'active' if current_source == s else '' }}">{{ s }}</a>
         {% endfor %}
     </nav>
+    {% if filter_summary %}<div class="filter-status">Filters: {{ filter_summary | e }}</div>{% endif %}
     {% for a in articles %}
     <div class="article">
         <h2><a href="{{ a.link }}" target="_blank" rel="noopener">{{ a.title }}</a></h2>
@@ -43,8 +45,8 @@
     </div>
     {% endfor %}
     <div class="pagination">
-        {% if page > 1 %}<a href="/?page={{ page - 1 }}{% if current_source %}&source={{ current_source }}{% endif %}">← Previous</a>{% endif %}
-        {% if has_next %}<a href="/?page={{ page + 1 }}{% if current_source %}&source={{ current_source }}{% endif %}">Next →</a>{% endif %}
+        {% if page > 1 %}<a href="/?page={{ page - 1 }}{% if current_source %}&source={{ current_source | urlencode }}{% endif %}">← Previous</a>{% endif %}
+        {% if has_next %}<a href="/?page={{ page + 1 }}{% if current_source %}&source={{ current_source | urlencode }}{% endif %}">Next →</a>{% endif %}
     </div>
 </body>
 </html>

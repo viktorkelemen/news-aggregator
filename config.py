@@ -1,5 +1,8 @@
 import os
 import json
+import logging
+
+log = logging.getLogger(__name__)
 
 DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://localhost/news_aggregator")
 # Fix Railway's postgres:// -> postgresql://
@@ -23,5 +26,8 @@ DEFAULT_SOURCES = [
 def get_sources():
     env_sources = os.environ.get("FEED_SOURCES")
     if env_sources:
-        return json.loads(env_sources)
+        try:
+            return json.loads(env_sources)
+        except json.JSONDecodeError as e:
+            log.error(f"Invalid FEED_SOURCES JSON: {e}, falling back to defaults")
     return DEFAULT_SOURCES

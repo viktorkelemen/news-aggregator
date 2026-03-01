@@ -13,9 +13,10 @@ class Article(Base):
     title = Column(String(1000), nullable=False)
     link = Column(String(2000), unique=True, nullable=False)
     source = Column(String(200), nullable=False)
-    published = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    published = Column(DateTime, index=True, default=lambda: datetime.now(timezone.utc))
     summary = Column(Text)
     content = Column(Text)
+    categories = Column(Text)
     fetched_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 def init_db():

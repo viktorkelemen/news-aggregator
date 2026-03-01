@@ -25,13 +25,19 @@ def fetch_source(name: str, url: str) -> int:
     db = SessionLocal()
     count = 0
     try:
+        # Batch dedup: collect all links, query existing ones in one shot
+        all_links = [entry.get("link", "") for entry in feed.entries if entry.get("link")]
+        existing_links = set()
+        if all_links:
+            rows = db.query(Article.link).filter(Article.link.in_(all_links)).all()
+            existing_links = {row[0] for row in rows}
+
+        seen_links = set(existing_links)
         for entry in feed.entries:
             link = entry.get("link", "")
-            if not link:
+            if not link or link in seen_links:
                 continue
-            exists = db.query(Article).filter(Article.link == link).first()
-            if exists:
-                continue
+            seen_links.add(link)
 
             published = None
             if hasattr(entry, "published_parsed") and entry.published_parsed:
@@ -42,6 +48,11 @@ def fetch_source(name: str, url: str) -> int:
             if hasattr(entry, "content") and entry.content:
                 content = entry.content[0].get("value", "")
 
+            # Parse category tags
+            categories = ""
+            if hasattr(entry, "tags") and entry.tags:
+                categories = ",".join(t.get("term", "") for t in entry.tags if t.get("term"))
+
             article = Article(
                 title=entry.get("title", "Untitled"),
                 link=link,
@@ -49,6 +60,7 @@ def fetch_source(name: str, url: str) -> int:
                 published=published or datetime.now(timezone.utc),
                 summary=summary[:5000] if summary else None,
                 content=content[:50000] if content else None,
+                categories=categories or None,
             )
             db.add(article)
             count += 1

@@ -1,0 +1,8 @@
+{
+  "global": {
+    "keyword_blocklist": [],
+    "keyword_allowlist": [],
+    "category_blocklist": []
+  },
+  "sources": {}
+}

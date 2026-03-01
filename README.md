@@ -33,7 +33,7 @@ Open http://localhost:8000
 |---|---|---|
 | `DATABASE_URL` | `postgresql://localhost/news_aggregator` | PostgreSQL connection string |
 | `PORT` | `8000` | Server port |
-| `FETCH_INTERVAL_MINUTES` | `30` | Minutes between feed fetches |
+| `FETCH_INTERVAL_MINUTES` | `360` | Minutes between feed fetches |
 | `SITE_TITLE` | `News Aggregator` | Page title |
 | `FEED_TITLE` | `Curated News Feed` | RSS feed title |
 | `FEED_DESCRIPTION` | `Aggregated news from multiple sources` | RSS feed description |
