@@ -4,7 +4,8 @@ import logging
 
 log = logging.getLogger(__name__)
 
-DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://localhost/news_aggregator")
+_db_dir = os.path.dirname(os.path.abspath(__file__))
+DATABASE_URL = os.environ.get("DATABASE_URL", f"sqlite:///{os.path.join(_db_dir, 'news.db')}")
 # Fix Railway's postgres:// -> postgresql://
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)

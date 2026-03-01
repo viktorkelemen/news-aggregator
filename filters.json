@@ -1,8 +1,8 @@
 {
   "global": {
-    "keyword_blocklist": [],
+    "keyword_blocklist": ["politics", "politician", "election", "trump", "orbán", "war", "military"],
     "keyword_allowlist": [],
-    "category_blocklist": []
+    "category_blocklist": ["Politics", "Policy", "Belfold"]
   },
   "sources": {}
 }
