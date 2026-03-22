@@ -18,6 +18,9 @@ FEED_TITLE = os.environ.get("FEED_TITLE", "Curated News Feed")
 FEED_DESCRIPTION = os.environ.get("FEED_DESCRIPTION", "Aggregated news from multiple sources")
 FEED_LINK = os.environ.get("FEED_LINK", "https://example.com")
 
+# LLM classification — set ANTHROPIC_API_KEY to enable topic tagging
+ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
+
 DEFAULT_SOURCES = [
     {"name": "The Verge", "url": "https://www.theverge.com/rss/index.xml"},
     {"name": "CNN", "url": "http://rss.cnn.com/rss/edition.rss"},

@@ -18,6 +18,7 @@ class Article(Base):
     summary = Column(Text)
     content = Column(Text)
     categories = Column(Text)
+    topics = Column(Text)  # LLM-classified topics, comma-separated
     fetched_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 def init_db():

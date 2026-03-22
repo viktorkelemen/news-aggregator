@@ -33,6 +33,8 @@ def article_passes_filter(article: Article, config: dict) -> bool:
     keyword_blocklist = [kw.lower() for kw in rules.get("keyword_blocklist", [])]
     keyword_allowlist = [kw.lower() for kw in rules.get("keyword_allowlist", [])]
     category_blocklist = [cat.lower() for cat in rules.get("category_blocklist", [])]
+    topic_blocklist = [t.lower() for t in rules.get("topic_blocklist", [])]
+    topic_allowlist = [t.lower() for t in rules.get("topic_allowlist", [])]
 
     text = f"{article.title or ''} {article.summary or ''}".lower()
 
@@ -41,6 +43,21 @@ def article_passes_filter(article: Article, config: dict) -> bool:
         article_cats = [c.strip().lower() for c in article.categories.split(",")]
         if any(blocked in article_cats for blocked in category_blocklist):
             return False
+
+    # Topic blocklist (LLM-classified topics)
+    if topic_blocklist and article.topics:
+        article_topics = [t.strip().lower() for t in article.topics.split(",")]
+        if any(blocked in article_topics for blocked in topic_blocklist):
+            return False
+
+    # Topic allowlist (when non-empty, article must have at least one matching topic)
+    if topic_allowlist and article.topics:
+        article_topics = [t.strip().lower() for t in article.topics.split(",")]
+        if not any(allowed in article_topics for allowed in topic_allowlist):
+            return False
+    elif topic_allowlist and not article.topics:
+        # No topics classified yet — let unclassified articles through
+        pass
 
     # Keyword blocklist
     if keyword_blocklist:
@@ -54,15 +71,17 @@ def article_passes_filter(article: Article, config: dict) -> bool:
 
     return True
 
+_ALL_RULE_KEYS = ("keyword_blocklist", "keyword_allowlist", "category_blocklist", "topic_blocklist", "topic_allowlist")
+
 def _has_any_rules(config: dict) -> bool:
     """Check if there are any active filter rules."""
     if not config:
         return False
     global_rules = config.get("global", {})
-    if any(global_rules.get(k) for k in ("keyword_blocklist", "keyword_allowlist", "category_blocklist")):
+    if any(global_rules.get(k) for k in _ALL_RULE_KEYS):
         return True
     for rules in config.get("sources", {}).values():
-        if any(rules.get(k) for k in ("keyword_blocklist", "keyword_allowlist", "category_blocklist")):
+        if any(rules.get(k) for k in _ALL_RULE_KEYS):
             return True
     return False
 
@@ -81,12 +100,18 @@ def get_filter_summary(config: dict) -> str | None:
     blocklist = global_rules.get("keyword_blocklist", [])
     allowlist = global_rules.get("keyword_allowlist", [])
     cat_blocklist = global_rules.get("category_blocklist", [])
+    topic_blocklist = global_rules.get("topic_blocklist", [])
+    topic_allowlist = global_rules.get("topic_allowlist", [])
     if blocklist:
         parts.append(f"Hiding keywords: {', '.join(blocklist)}")
     if cat_blocklist:
         parts.append(f"Hiding categories: {', '.join(cat_blocklist)}")
+    if topic_blocklist:
+        parts.append(f"Hiding topics: {', '.join(topic_blocklist)}")
     if allowlist:
         parts.append(f"Only showing: {', '.join(allowlist)}")
+    if topic_allowlist:
+        parts.append(f"Only topics: {', '.join(topic_allowlist)}")
     source_rules = config.get("sources", {})
     if source_rules:
         for name, rules in source_rules.items():
@@ -95,8 +120,12 @@ def get_filter_summary(config: dict) -> str | None:
                 src_parts.append(f"hiding: {', '.join(rules['keyword_blocklist'])}")
             if rules.get("category_blocklist"):
                 src_parts.append(f"hiding categories: {', '.join(rules['category_blocklist'])}")
+            if rules.get("topic_blocklist"):
+                src_parts.append(f"hiding topics: {', '.join(rules['topic_blocklist'])}")
             if rules.get("keyword_allowlist"):
                 src_parts.append(f"only: {', '.join(rules['keyword_allowlist'])}")
+            if rules.get("topic_allowlist"):
+                src_parts.append(f"only topics: {', '.join(rules['topic_allowlist'])}")
             if src_parts:
                 parts.append(f"{name}: {'; '.join(src_parts)}")
     return " | ".join(parts) if parts else None

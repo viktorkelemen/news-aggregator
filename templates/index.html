@@ -23,6 +23,8 @@
         .pagination { margin-top: 1rem; display: flex; gap: 1rem; }
         .pagination a { color: #1a0dab; text-decoration: none; }
         .filter-status { font-size: 0.8rem; color: #888; margin-bottom: 1rem; padding: 0.4rem 0.6rem; background: #f0f0f0; border-radius: 4px; }
+        .topics { display: flex; gap: 0.3rem; flex-wrap: wrap; margin-top: 0.3rem; }
+        .topic-tag { font-size: 0.7rem; padding: 0.1rem 0.4rem; border-radius: 3px; background: #e3f2fd; color: #1565c0; }
     </style>
 </head>
 <body>
@@ -42,6 +44,7 @@
         <h2><a href="{{ a.link }}" target="_blank" rel="noopener">{{ a.title }}</a></h2>
         <div class="meta">{{ a.source }} · {{ a.published.strftime('%Y-%m-%d %H:%M') if a.published else '' }}</div>
         {% if a.summary %}<div class="summary">{{ a.summary[:300] | e }}{% if a.summary|length > 300 %}…{% endif %}</div>{% endif %}
+        {% if a.topics %}<div class="topics">{% for t in a.topics.split(',') %}<span class="topic-tag">{{ t.strip() }}</span>{% endfor %}</div>{% endif %}
     </div>
     {% endfor %}
     <div class="pagination">
