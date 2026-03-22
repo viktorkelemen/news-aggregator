@@ -25,6 +25,12 @@ DEFAULT_SOURCES = [
     {"name": "The Verge", "url": "https://www.theverge.com/rss/index.xml"},
     {"name": "CNN", "url": "http://rss.cnn.com/rss/edition.rss"},
     {"name": "Telex.hu", "url": "https://telex.hu/rss"},
+    {"name": "Gothamist", "url": "https://gothamist.com/feed"},
+    {"name": "The City", "url": "https://www.thecity.nyc/feed/"},
+    {"name": "Brooklyn Paper", "url": "https://www.brooklynpaper.com/feed/"},
+    {"name": "Brooklyn Eagle", "url": "https://brooklyneagle.com/feed"},
+    {"name": "Brownstoner", "url": "https://www.brownstoner.com/feed/"},
+    {"name": "amNewYork", "url": "https://www.amny.com/feed/"},
 ]
 
 def get_sources():
