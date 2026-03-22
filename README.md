@@ -39,6 +39,7 @@ Open http://localhost:8000
 | `FEED_DESCRIPTION` | `Aggregated news from multiple sources` | RSS feed description |
 | `FEED_LINK` | `https://example.com` | RSS feed link |
 | `FEED_SOURCES` | *(built-in defaults)* | JSON array of `{"name": "...", "url": "..."}` |
+| `ANTHROPIC_API_KEY` | *(empty)* | Enables LLM-based topic classification |
 
 ## Default Sources
 

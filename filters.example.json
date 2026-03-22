@@ -2,13 +2,17 @@
   "global": {
     "keyword_blocklist": ["politics", "politician", "election", "celebrity", "gossip"],
     "keyword_allowlist": [],
-    "category_blocklist": ["Politics", "Policy", "Belfold"]
+    "category_blocklist": ["Politics", "Policy", "Belfold"],
+    "topic_blocklist": ["Politics", "Celebrity", "Military"],
+    "topic_allowlist": []
   },
   "sources": {
     "The Verge": {
       "keyword_blocklist": ["crypto"],
       "keyword_allowlist": [],
-      "category_blocklist": ["Crypto"]
+      "category_blocklist": ["Crypto"],
+      "topic_blocklist": ["Crypto"],
+      "topic_allowlist": []
     }
   }
 }
