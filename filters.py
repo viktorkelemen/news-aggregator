@@ -26,6 +26,18 @@ def _get_rules_for_source(config: dict, source_name: str) -> dict:
         return source_rules
     return global_rules
 
+def _parse_csv(value: str | None) -> list[str]:
+    """Parse a comma-separated field into lowercase stripped tokens."""
+    if not value:
+        return []
+    return [t.strip().lower() for t in value.split(",")]
+
+
+def _check_blocklist(tokens: list[str], blocklist: list[str]) -> bool:
+    """Return True if any token is in the blocklist."""
+    return any(t in blocklist for t in tokens)
+
+
 def article_passes_filter(article: Article, config: dict) -> bool:
     """Check if a single article passes the filter criteria."""
     rules = _get_rules_for_source(config, article.source)
@@ -37,27 +49,19 @@ def article_passes_filter(article: Article, config: dict) -> bool:
     topic_allowlist = [t.lower() for t in rules.get("topic_allowlist", [])]
 
     text = f"{article.title or ''} {article.summary or ''}".lower()
+    article_cats = _parse_csv(article.categories)
+    article_topics = _parse_csv(article.topics)
 
-    # Category blocklist
-    if category_blocklist and article.categories:
-        article_cats = [c.strip().lower() for c in article.categories.split(",")]
-        if any(blocked in article_cats for blocked in category_blocklist):
-            return False
+    if category_blocklist and _check_blocklist(article_cats, category_blocklist):
+        return False
 
-    # Topic blocklist (LLM-classified topics)
-    if topic_blocklist and article.topics:
-        article_topics = [t.strip().lower() for t in article.topics.split(",")]
-        if any(blocked in article_topics for blocked in topic_blocklist):
-            return False
+    if topic_blocklist and _check_blocklist(article_topics, topic_blocklist):
+        return False
 
-    # Topic allowlist (when non-empty, article must have at least one matching topic)
-    if topic_allowlist and article.topics:
-        article_topics = [t.strip().lower() for t in article.topics.split(",")]
-        if not any(allowed in article_topics for allowed in topic_allowlist):
+    # Topic allowlist: article must match at least one; unclassified articles pass through
+    if topic_allowlist and article_topics:
+        if not any(t in topic_allowlist for t in article_topics):
             return False
-    elif topic_allowlist and not article.topics:
-        # No topics classified yet — let unclassified articles through
-        pass
 
     # Keyword blocklist
     if keyword_blocklist:

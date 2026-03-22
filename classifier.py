@@ -1,5 +1,6 @@
 import json
 import logging
+import config
 from models import Article
 
 log = logging.getLogger(__name__)
@@ -22,7 +23,7 @@ Example response:
 [{{"index": 0, "topics": ["Technology", "AI"]}}, {{"index": 1, "topics": ["Politics", "World"]}}]"""
 
 
-def classify_articles(articles: list[Article], api_key: str) -> dict[int, list[str]]:
+def classify_articles(articles: list[Article]) -> dict[int, list[str]]:
     """Classify articles by topic using Claude. Returns {article.id: [topics]}."""
     if not articles:
         return {}
@@ -33,9 +34,8 @@ def classify_articles(articles: list[Article], api_key: str) -> dict[int, list[s
         log.warning("anthropic package not installed, skipping classification")
         return {}
 
-    client = anthropic.Anthropic(api_key=api_key)
+    client = anthropic.Anthropic(api_key=config.ANTHROPIC_API_KEY)
 
-    # Process in batches of 20 to stay within reasonable token limits
     results = {}
     for batch_start in range(0, len(articles), 20):
         batch = articles[batch_start:batch_start + 20]
@@ -87,9 +87,7 @@ def store_topics(db, topic_map: dict[int, list[str]]):
     """Write classified topics back to the database."""
     if not topic_map:
         return
-    for article_id, topics in topic_map.items():
-        db.query(Article).filter(Article.id == article_id).update(
-            {"topics": ",".join(topics)}
-        )
+    mappings = [{"id": aid, "topics": ",".join(topics)} for aid, topics in topic_map.items()]
+    db.bulk_update_mappings(Article, mappings)
     db.commit()
     log.info(f"Stored topics for {len(topic_map)} articles")

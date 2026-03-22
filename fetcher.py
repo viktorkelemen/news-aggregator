@@ -26,7 +26,7 @@ def fetch_all():
     if all_new_articles and config.ANTHROPIC_API_KEY:
         try:
             from classifier import classify_articles, store_topics
-            topic_map = classify_articles(all_new_articles, config.ANTHROPIC_API_KEY)
+            topic_map = classify_articles(all_new_articles)
             if topic_map:
                 db = SessionLocal()
                 try:
@@ -84,6 +84,9 @@ def fetch_source(name: str, url: str) -> list[Article]:
             db.add(article)
             new_articles.append(article)
         db.commit()
+        # Expunge so articles are usable after session closes
+        for a in new_articles:
+            db.expunge(a)
     except Exception:
         db.rollback()
         raise
